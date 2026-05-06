@@ -1,16 +1,44 @@
 import { z } from "zod";
 
-const extraPaymentSchema = z.object({
-  enabled: z.boolean().default(false),
+const extraPaymentSchema = z
+  .object({
+    enabled: z.boolean().default(false),
 
-  amount: z.number().min(0).default(0),
+    type: z.enum(["SINGLE", "RECURRING"]).default("SINGLE"),
 
-  startMonth: z.number().int().min(1).default(1),
+    amount: z.number().min(0).default(0),
 
-  strategy: z
-    .enum(["REDUCE_TERM", "REDUCE_INSTALLMENT"])
-    .default("REDUCE_TERM"),
-});
+    startMonth: z.number().int().min(1).default(1),
+
+    frequencyMonths: z.number().int().min(1).optional().default(1),
+
+    strategy: z
+      .enum(["REDUCE_TERM", "REDUCE_INSTALLMENT"])
+      .default("REDUCE_TERM"),
+  })
+  .refine(
+    (data) => {
+      if (!data.enabled) return true;
+
+      return data.amount > 0;
+    },
+    {
+      message: "O aporte deve ser maior que zero.",
+      path: ["amount"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (!data.enabled) return true;
+      if (data.type !== "RECURRING") return true;
+
+      return !!data.frequencyMonths && data.frequencyMonths > 0;
+    },
+    {
+      message: "A frequência deve ser maior que zero.",
+      path: ["frequencyMonths"],
+    },
+  );
 
 export const simulatorSchema = z
   .object({

@@ -1,13 +1,14 @@
-import { Box, Container, Typography, Paper, Grid } from "@mui/material";
+import { Container, Grid } from "@mui/material";
 import { useEffect } from "react";
 
-import { SimulatorForm } from "../modules/simulator/components/SimulatorForm";
-import { useAmortization } from "../modules/simulator/hooks/useAmortization";
-import { SimulationSummary } from "../modules/simulator/components/SimulationSummary";
-import { EvolutionTable } from "../modules/simulator/components/EvolutionTable";
-
-import { useLocalStorage } from "../modules/simulator/hooks/useLocalStorage";
+import { useAmortization } from "@/modules/simulator/hooks/useAmortization";
+import { useLocalStorage } from "@/modules/simulator/hooks/useLocalStorage";
 import { SimulationInput } from "@/modules/simulator/types/simulation.types";
+import { SimulatorFormData } from "@/modules/simulator/schemas/simulatorSchema";
+import { PageHeader } from "@/modules/simulator/sections/PageHeader";
+import { ContractSection } from "@/modules/simulator/sections/ContractSection";
+import { ResultsSection } from "@/modules/simulator/sections/ResultSection";
+import { EvolutionTable } from "@/modules/simulator/components/EvolutionTable";
 
 export default function Home() {
   const { results, summary, comparison, handleSimulate } = useAmortization();
@@ -23,75 +24,29 @@ export default function Home() {
     }
   }, [lastInput, handleSimulate, results.length]);
 
-  const onSimulateHandler = (data: SimulationInput) => {
+  const onSimulateHandler = (data: SimulatorFormData) => {
     setLastInput(data);
     handleSimulate(data);
   };
 
   return (
     <Container maxWidth="lg" sx={{ py: 8 }}>
-      {/* Seção de Cabeçalho */}
-      <Box sx={{ mb: 6, textAlign: "center" }}>
-        <Typography
-          variant="h3"
-          component="h1"
-          gutterBottom
-          sx={{ fontWeight: "800", color: "primary.main" }}
-        >
-          Simulador Financiamento Pro
-        </Typography>
-        <Typography
-          variant="h6"
-          color="text.secondary"
-          sx={{ fontWeight: 400 }}
-        >
-          Simulador Profissional SAC/PRICE com Correção TR
-        </Typography>
-      </Box>
+      <PageHeader />
 
       <Grid container spacing={4}>
-        {/* Coluna Esquerda: Formulário de Entrada */}
         <Grid size={{ xs: 12, md: 4 }}>
-          <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
-            <SimulatorForm onSimulate={onSimulateHandler} />
-          </Paper>
+          <ContractSection onSimulate={onSimulateHandler} />
         </Grid>
 
-        {/* Coluna Direita: Resultados */}
         <Grid size={{ xs: 12, md: 8 }}>
-          {!summary ? (
-            <Paper
-              variant="outlined"
-              sx={{
-                p: 10,
-                textAlign: "center",
-                bgcolor: "grey.50",
-                borderStyle: "dashed",
-                borderRadius: 2,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                minHeight: "400px",
-              }}
-            >
-              <Typography variant="h6" color="text.secondary">
-                Pronto para calcular?
-              </Typography>
-              <Typography variant="body2" color="text.disabled">
-                Preencha os detalhes ao lado para gerar seu cronograma de
-                amortização.
-              </Typography>
-            </Paper>
-          ) : (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              {/* Resumo em Cards */}
-              <SimulationSummary summary={summary} comparison={comparison} />
-
-              {/* Tabela de Evolução Mensal */}
-              <EvolutionTable installments={results} />
-            </Box>
-          )}
+          <ResultsSection summary={summary} comparison={comparison} />
         </Grid>
+
+        {summary && (
+          <Grid size={12}>
+            <EvolutionTable installments={results} />
+          </Grid>
+        )}
       </Grid>
     </Container>
   );

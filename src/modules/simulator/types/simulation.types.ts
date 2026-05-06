@@ -62,7 +62,9 @@ export interface ScenarioComparison {
 
 export interface SingleExtraPaymentForm {
   enabled: boolean;
+  type: ExtraPaymentType;
   amount: number;
   startMonth: number;
+  frequencyMonths?: number;
   strategy: ExtraPaymentStrategy;
 }

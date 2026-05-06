@@ -22,10 +22,14 @@ export const useAmortization = () => {
         data.extraPayment?.enabled && data.extraPayment.amount > 0
           ? [
               {
-                type: "SINGLE",
+                type: data.extraPayment.type,
                 strategy: data.extraPayment.strategy,
                 amount: data.extraPayment.amount,
                 startMonth: data.extraPayment.startMonth,
+                frequencyMonths:
+                  data.extraPayment.type === "RECURRING"
+                    ? data.extraPayment.frequencyMonths
+                    : undefined,
               },
             ]
           : [],
