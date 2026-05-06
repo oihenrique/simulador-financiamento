@@ -37,6 +37,7 @@ export interface Installment {
   fees: number;
   extraPayment: number;
   totalInstallment: number;
+  totalMonthPayment: number;
   finalBalance: number;
 }
 

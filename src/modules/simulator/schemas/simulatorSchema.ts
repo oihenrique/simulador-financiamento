@@ -45,11 +45,28 @@ export const simulatorSchema = z
     }),
     extraPayment: extraPaymentSchema.optional(),
   })
-  .refine((data) => data.downPayment + data.subsidy < data.imovelValue, {
-    message:
-      "A soma da entrada e do subsídio deve ser menor que o valor do imóvel.",
-    path: ["downPayment"],
-  });
+  .refine(
+    (data) => {
+      if (!data.extraPayment?.enabled) return true;
+
+      return data.extraPayment.amount > 0;
+    },
+    {
+      message: "O aporte deve ser maior que zero.",
+      path: ["extraPayment", "amount"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (!data.extraPayment?.enabled) return true;
+
+      return data.extraPayment.startMonth <= data.termMonths;
+    },
+    {
+      message: "O mês do aporte deve estar dentro do prazo.",
+      path: ["extraPayment", "startMonth"],
+    },
+  );
 
 export type SimulatorFormInput = z.input<typeof simulatorSchema>;
 export type SimulatorFormData = z.output<typeof simulatorSchema>;

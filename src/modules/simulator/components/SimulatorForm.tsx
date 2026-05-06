@@ -30,7 +30,7 @@ export const SimulatorForm = ({ onSimulate }: Props) => {
     resolver: zodResolver(simulatorSchema),
     defaultValues: {
       amortizationSystem: "SAC",
-      trEstimated: 0.0005, // 0.05% padrão
+      trEstimated: 0.05, // 0.05% padrão
       fees: {
         monthlyAdminFee: 25,
         insuranceFee: 0,
@@ -84,6 +84,21 @@ export const SimulatorForm = ({ onSimulate }: Props) => {
             {...register("annualInterestRate", { valueAsNumber: true })}
             error={!!errors.annualInterestRate}
             helperText={errors.annualInterestRate?.message}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            fullWidth
+            label="TR Mensal Estimada (%)"
+            type="number"
+            slotProps={{ htmlInput: { step: "0.0001" } }}
+            {...register("trEstimated", {
+              valueAsNumber: true,
+              setValueAs: (value) => Number(value) / 100,
+            })}
+            error={!!errors.trEstimated}
+            helperText={errors.trEstimated?.message ?? "Ex.: 0,05% = 0.05"}
           />
         </Grid>
 
@@ -156,6 +171,8 @@ export const SimulatorForm = ({ onSimulate }: Props) => {
                         {...register("extraPayment.amount", {
                           valueAsNumber: true,
                         })}
+                        error={!!errors.extraPayment?.amount}
+                        helperText={errors.extraPayment?.amount?.message}
                       />
                     </Grid>
 
@@ -167,6 +184,8 @@ export const SimulatorForm = ({ onSimulate }: Props) => {
                         {...register("extraPayment.startMonth", {
                           valueAsNumber: true,
                         })}
+                        error={!!errors.extraPayment?.startMonth}
+                        helperText={errors.extraPayment?.startMonth?.message}
                       />
                     </Grid>
 

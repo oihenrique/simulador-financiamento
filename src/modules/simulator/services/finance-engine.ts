@@ -125,7 +125,7 @@ export const calculateAmortization = (
   for (let month = 1; month <= termMonths; month++) {
     const initialBalance = currentBalance;
 
-    const correctedBalance = initialBalance * (1 + trEstimated);
+    const correctedBalance = initialBalance * (1 + trEstimated / 100);
 
     const interest = correctedBalance * monthlyInterestRate;
 
@@ -160,6 +160,7 @@ export const calculateAmortization = (
       fees: roundMoney(totalFees),
       extraPayment: roundMoney(extraPayment),
       totalInstallment: roundMoney(regularInstallment),
+      totalMonthPayment: roundMoney(regularInstallment + extraPayment),
       finalBalance: roundMoney(currentBalance),
     });
 
