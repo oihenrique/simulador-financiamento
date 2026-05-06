@@ -1,78 +1,102 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Box, Container, Typography, Paper, Grid } from "@mui/material";
+import { useEffect } from "react";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+// Imports de Domínio
+import { SimulatorForm } from "../modules/simulator/components/SimulatorForm";
+import { useAmortization } from "../modules/simulator/hooks/useAmortization";
+import { SimulationSummary } from "../modules/simulator/components/SimulationSummary";
+import { EvolutionTable } from "../modules/simulator/components/EvolutionTable";
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+// Hook Utilitário para Persistência
+import { useLocalStorage } from "../modules/simulator/hooks/useLocalStorage";
+import { SimulationInput } from "@/modules/simulator/types/simulation.types";
 
 export default function Home() {
+  const { results, summary, handleSimulate } = useAmortization();
+
+  // Persistimos os dados brutos da última simulação para recuperar o estado ao dar F5
+  const [lastInput, setLastInput] = useLocalStorage<SimulationInput | null>(
+    "last_input",
+    null,
+  );
+
+  // Efeito para re-simular automaticamente caso existam dados no LocalStorage
+  useEffect(() => {
+    if (lastInput && results.length === 0) {
+      handleSimulate(lastInput);
+    }
+  }, [lastInput, handleSimulate, results.length]);
+
+  const onSimulateHandler = (data: SimulationInput) => {
+    setLastInput(data); // Salva para o futuro
+    handleSimulate(data); // Executa o cálculo agora
+  };
+
   return (
-    <div
-      className={`${geistSans.className} ${geistMono.className} flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black`}
-    >
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the index.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <Container maxWidth="lg" sx={{ py: 8 }}>
+      {/* Seção de Cabeçalho */}
+      <Box sx={{ mb: 6, textAlign: "center" }}>
+        <Typography
+          variant="h3"
+          component="h1"
+          gutterBottom
+          sx={{ fontWeight: "800", color: "primary.main" }}
+        >
+          Mortgage Pro
+        </Typography>
+        <Typography
+          variant="h6"
+          color="text.secondary"
+          sx={{ fontWeight: 400 }}
+        >
+          Simulador Profissional SAC/PRICE com Correção TR
+        </Typography>
+      </Box>
+
+      <Grid container spacing={4}>
+        {/* Coluna Esquerda: Formulário de Entrada */}
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
+            <SimulatorForm onSimulate={onSimulateHandler} />
+          </Paper>
+        </Grid>
+
+        {/* Coluna Direita: Resultados */}
+        <Grid size={{ xs: 12, md: 8 }}>
+          {!summary ? (
+            <Paper
+              variant="outlined"
+              sx={{
+                p: 10,
+                textAlign: "center",
+                bgcolor: "grey.50",
+                borderStyle: "dashed",
+                borderRadius: 2,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                minHeight: "400px",
+              }}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs/pages/getting-started?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+              <Typography variant="h6" color="text.secondary">
+                Pronto para calcular?
+              </Typography>
+              <Typography variant="body2" color="text.disabled">
+                Preencha os detalhes ao lado para gerar seu cronograma de
+                amortização.
+              </Typography>
+            </Paper>
+          ) : (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              {/* Resumo em Cards */}
+              <SimulationSummary summary={summary} />
+
+              {/* Tabela de Evolução Mensal */}
+              <EvolutionTable installments={results} />
+            </Box>
+          )}
+        </Grid>
+      </Grid>
+    </Container>
   );
 }
