@@ -1,5 +1,17 @@
 import { z } from "zod";
 
+const extraPaymentSchema = z.object({
+  enabled: z.boolean().default(false),
+
+  amount: z.number().min(0).default(0),
+
+  startMonth: z.number().int().min(1).default(1),
+
+  strategy: z
+    .enum(["REDUCE_TERM", "REDUCE_INSTALLMENT"])
+    .default("REDUCE_TERM"),
+});
+
 export const simulatorSchema = z
   .object({
     imovelValue: z
@@ -31,6 +43,7 @@ export const simulatorSchema = z
       monthlyAdminFee: z.number().min(0).default(25),
       insuranceFee: z.number().min(0).default(0),
     }),
+    extraPayment: extraPaymentSchema.optional(),
   })
   .refine((data) => data.downPayment + data.subsidy < data.imovelValue, {
     message:

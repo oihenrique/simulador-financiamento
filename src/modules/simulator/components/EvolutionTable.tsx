@@ -50,6 +50,15 @@ export const EvolutionTable = ({ installments }: Props) => {
             <TableCell align="right" sx={{ fontWeight: "bold" }}>
               Saldo Devedor
             </TableCell>
+            <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              Saldo Corrigido
+            </TableCell>
+            <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              Taxas
+            </TableCell>
+            <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              Aporte Extra
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -72,6 +81,19 @@ export const EvolutionTable = ({ installments }: Props) => {
                 sx={{ fontWeight: "bold", color: "primary.main" }}
               >
                 {formatCurrency(row.finalBalance)}
+              </TableCell>
+              <TableCell align="right">
+                {formatCurrency(row.correctedBalance)}
+              </TableCell>
+              <TableCell align="right">{formatCurrency(row.fees)}</TableCell>
+              <TableCell
+                align="right"
+                sx={{
+                  fontWeight: row.extraPayment > 0 ? "bold" : "normal",
+                  color: row.extraPayment > 0 ? "success.main" : "text.primary",
+                }}
+              >
+                {formatCurrency(row.extraPayment)}
               </TableCell>
             </TableRow>
           ))}

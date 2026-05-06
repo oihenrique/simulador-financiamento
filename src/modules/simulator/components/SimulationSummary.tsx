@@ -1,11 +1,12 @@
 import { Grid, Card, CardContent, Typography, Box } from "@mui/material";
-import { SummaryType } from "../types/simulation.types";
+import { ScenarioComparison, SummaryType } from "../types/simulation.types";
 
 interface Props {
   summary: SummaryType;
+  comparison?: ScenarioComparison | null;
 }
 
-export const SimulationSummary = ({ summary }: Props) => {
+export const SimulationSummary = ({ summary, comparison }: Props) => {
   const formatCurrency = (value: number) =>
     value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -46,18 +47,7 @@ export const SimulationSummary = ({ summary }: Props) => {
           </Card>
         </Grid>
 
-        <Grid size={{ xs: 12, sm: 4 }}>
-          <Card variant="outlined">
-            <CardContent>
-              <Typography variant="overline" color="text.secondary">
-                Prazo
-              </Typography>
-              <Typography variant="h6">{summary.term} meses</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid size={{ xs: 12, sm: 4 }}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Card variant="outlined">
             <CardContent>
               <Typography variant="overline" color="text.secondary">
@@ -70,7 +60,7 @@ export const SimulationSummary = ({ summary }: Props) => {
           </Card>
         </Grid>
 
-        <Grid size={{ xs: 12, sm: 4 }}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Card variant="outlined">
             <CardContent>
               <Typography variant="overline" color="text.secondary">
@@ -82,6 +72,47 @@ export const SimulationSummary = ({ summary }: Props) => {
             </CardContent>
           </Card>
         </Grid>
+
+        <Grid size={{ xs: 12, sm: 4 }}>
+          <Card variant="outlined">
+            <CardContent>
+              <Typography variant="overline" color="text.secondary">
+                Prazo
+              </Typography>
+              <Typography variant="h6">{summary.term} meses</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {comparison && (
+          <>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <Card variant="outlined">
+                <CardContent>
+                  <Typography variant="overline" color="text.secondary">
+                    Economia em Juros
+                  </Typography>
+                  <Typography variant="h6" color="success.main">
+                    {formatCurrency(comparison.interestSaved)}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <Card variant="outlined">
+                <CardContent>
+                  <Typography variant="overline" color="text.secondary">
+                    Meses Antecipados
+                  </Typography>
+                  <Typography variant="h6" color="success.main">
+                    {comparison.monthsSaved} meses
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          </>
+        )}
       </Grid>
     </Box>
   );

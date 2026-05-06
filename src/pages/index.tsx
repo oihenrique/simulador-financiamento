@@ -1,26 +1,22 @@
 import { Box, Container, Typography, Paper, Grid } from "@mui/material";
 import { useEffect } from "react";
 
-// Imports de Domínio
 import { SimulatorForm } from "../modules/simulator/components/SimulatorForm";
 import { useAmortization } from "../modules/simulator/hooks/useAmortization";
 import { SimulationSummary } from "../modules/simulator/components/SimulationSummary";
 import { EvolutionTable } from "../modules/simulator/components/EvolutionTable";
 
-// Hook Utilitário para Persistência
 import { useLocalStorage } from "../modules/simulator/hooks/useLocalStorage";
 import { SimulationInput } from "@/modules/simulator/types/simulation.types";
 
 export default function Home() {
-  const { results, summary, handleSimulate } = useAmortization();
+  const { results, summary, comparison, handleSimulate } = useAmortization();
 
-  // Persistimos os dados brutos da última simulação para recuperar o estado ao dar F5
   const [lastInput, setLastInput] = useLocalStorage<SimulationInput | null>(
     "last_input",
     null,
   );
 
-  // Efeito para re-simular automaticamente caso existam dados no LocalStorage
   useEffect(() => {
     if (lastInput && results.length === 0) {
       handleSimulate(lastInput);
@@ -28,8 +24,8 @@ export default function Home() {
   }, [lastInput, handleSimulate, results.length]);
 
   const onSimulateHandler = (data: SimulationInput) => {
-    setLastInput(data); // Salva para o futuro
-    handleSimulate(data); // Executa o cálculo agora
+    setLastInput(data);
+    handleSimulate(data);
   };
 
   return (
@@ -42,7 +38,7 @@ export default function Home() {
           gutterBottom
           sx={{ fontWeight: "800", color: "primary.main" }}
         >
-          Mortgage Pro
+          Simulador Financiamento Pro
         </Typography>
         <Typography
           variant="h6"
@@ -89,7 +85,7 @@ export default function Home() {
           ) : (
             <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
               {/* Resumo em Cards */}
-              <SimulationSummary summary={summary} />
+              <SimulationSummary summary={summary} comparison={comparison} />
 
               {/* Tabela de Evolução Mensal */}
               <EvolutionTable installments={results} />

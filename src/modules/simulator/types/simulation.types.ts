@@ -1,5 +1,17 @@
 export type AmortizationSystem = "SAC" | "PRICE";
 
+export type ExtraPaymentType = "SINGLE" | "RECURRING";
+
+export type ExtraPaymentStrategy = "REDUCE_TERM" | "REDUCE_INSTALLMENT";
+
+export interface ExtraPayment {
+  type: ExtraPaymentType;
+  strategy: ExtraPaymentStrategy;
+  amount: number;
+  startMonth: number;
+  frequencyMonths?: number;
+}
+
 export interface SimulationInput {
   imovelValue: number;
   downPayment: number;
@@ -7,11 +19,13 @@ export interface SimulationInput {
   annualInterestRate: number;
   termMonths: number;
   amortizationSystem: AmortizationSystem;
-  trEstimated: number; // Ex: 0.0005 para 0.05%
+  trEstimated: number;
   fees: {
     monthlyAdminFee: number;
     insuranceFee: number;
   };
+  extraPayment?: SingleExtraPaymentForm;
+  extraPayments?: ExtraPayment[];
 }
 
 export interface Installment {
@@ -21,6 +35,7 @@ export interface Installment {
   interest: number;
   amortization: number;
   fees: number;
+  extraPayment: number;
   totalInstallment: number;
   finalBalance: number;
 }
@@ -30,5 +45,23 @@ export interface SummaryType {
   totalInterest: number;
   totalFees: number;
   totalAmortized: number;
+  totalExtraPaid: number;
   term: number;
+}
+
+export interface ScenarioComparison {
+  baseSchedule: Installment[];
+  acceleratedSchedule: Installment[];
+  baseSummary: SummaryType;
+  acceleratedSummary: SummaryType;
+  interestSaved: number;
+  totalSaved: number;
+  monthsSaved: number;
+}
+
+export interface SingleExtraPaymentForm {
+  enabled: boolean;
+  amount: number;
+  startMonth: number;
+  strategy: ExtraPaymentStrategy;
 }
